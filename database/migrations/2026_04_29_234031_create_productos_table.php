@@ -17,8 +17,10 @@ return new class extends Migration
         $table->text('descripcion')->nullable();
         $table->decimal('precio', 10, 2);
         $table->integer('stock');
+        $table->string('unidad_medida')->default('unidad');
         // Relación con categorías
         $table->foreignId('categoria_id')->constrained('categorias')->onDelete('cascade');
+        $table->foreignId('marca_id')->constrained('marcas')->onDelete('cascade'); 
         $table->timestamps();
     });
 }

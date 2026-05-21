@@ -10,21 +10,22 @@ class ProductoController extends Controller
 {
     public function index(): JsonResponse
     {
-        // Usamos 'with' para que traiga también la info de la categoría
-        $productos = Producto::with('categoria')->get();
-        return response()->json($productos);
+        // Trae los productos con sus categorías y marcas de forma anidada
+        $productos = Producto::with(['categoria', 'marca'])->get();
+        return response()->json($productos, 200);
     }
 
     public function store(Request $request): JsonResponse
     {
         try {
             $request->validate([
-                'nombre'       => 'required|string|max:255',
-                'descripcion'  => 'nullable|string',
-                'precio'       => 'required|numeric|min:0',
-                'unidad_medida'=> 'required|in:unidad,metro,kg,m2',
-                'stock'        => 'required|integer|min:0',
-                'categoria_id' => 'required|exists:categorias,id'
+                'nombre'        => 'required|string|max:255',
+                'descripcion'   => 'nullable|string',
+                'precio'        => 'required|numeric|min:0',
+                'unidad_medida' => 'required|in:unidad,metro,kg,m2',
+                'stock'         => 'required|integer|min:0',
+                'categoria_id'  => 'required|exists:categorias,id',
+                'marca_id'      => 'required|exists:marcas,id' // Validación de la marca
             ]);
 
             $producto = Producto::create($request->all());
@@ -46,7 +47,8 @@ class ProductoController extends Controller
 
     public function show($id): JsonResponse
     {
-        $producto = Producto::with('categoria')->find($id);
+        // También incluimos la marca en la vista de un solo producto
+        $producto = Producto::with(['categoria', 'marca'])->find($id);
 
         if (!$producto) {
             return response()->json(['message' => 'Producto no encontrado'], 404);
@@ -65,11 +67,12 @@ class ProductoController extends Controller
             }
 
             $request->validate([
-                'nombre'       => 'required|string|max:255',
-                'precio'       => 'required|numeric',
-                'unidad_medida'=> 'required|in:unidad,metro,kg,m2',
-                'stock'        => 'required|integer',
-                'categoria_id' => 'required|exists:categorias,id'
+                'nombre'        => 'required|string|max:255',
+                'precio'        => 'required|numeric',
+                'unidad_medida' => 'required|in:unidad,metro,kg,m2',
+                'stock'         => 'required|integer',
+                'categoria_id'  => 'required|exists:categorias,id',
+                'marca_id'      => 'required|exists:marcas,id' // Validación de la marca
             ]);
 
             $producto->update($request->all());
@@ -113,9 +116,4 @@ class ProductoController extends Controller
             ], 500);
         }
     }
-
-    
-
-
-
 }
