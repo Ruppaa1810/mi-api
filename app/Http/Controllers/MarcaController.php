@@ -4,62 +4,103 @@ namespace App\Http\Controllers;
 
 use App\Models\Marca;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class MarcaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): JsonResponse
     {
-        //
+        $marcas = Marca::all();
+        return response()->json($marcas);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(Request $request): JsonResponse
     {
-        //
+        try {
+            $request->validate([
+                'nombre' => 'required|string|max:50|unique:marcas,nombre',
+            ]);
+
+            $marca = Marca::create($request->all());
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Marca creada exitosamente.',
+                'data'    => $marca
+            ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al crear la marca.',
+                'error'   => $e->getMessage()
+            ], 500);
+        }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function show($id): JsonResponse
     {
-        //
+        $marca = Marca::find($id);
+
+        if (!$marca) {
+            return response()->json(['message' => 'Marca no encontrada'], 404);
+        }
+
+        return response()->json($marca, 200);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Marca $marca)
+    public function update(Request $request, $id): JsonResponse
     {
-        //
+        try {
+            $marca = Marca::find($id);
+
+            if (!$marca) {
+                return response()->json(['message' => 'Marca no encontrada'], 404);
+            }
+
+            $request->validate([
+                'nombre' => 'required|string|max:50|unique:marcas,nombre,' . $id
+            ]);
+
+            $marca->update($request->all());
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Marca actualizada correctamente.',
+                'data'    => $marca
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al actualizar.',
+                'error'   => $e->getMessage()
+            ], 500);
+        }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Marca $marca)
+    public function destroy($id): JsonResponse
     {
-        //
-    }
+        try {
+            $marca = Marca::find($id);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Marca $marca)
-    {
-        //
-    }
+            if (!$marca) {
+                return response()->json(['message' => 'Marca no encontrada'], 404);
+            }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Marca $marca)
-    {
-        //
+            $marca->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Marca eliminada correctamente.'
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al eliminar la marca.',
+                'error'   => $e->getMessage()
+            ], 500);
+        }
     }
 }

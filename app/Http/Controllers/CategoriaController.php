@@ -5,34 +5,25 @@ namespace App\Http\Controllers;
 use App\Models\Categoria;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use App\Http\Controllers\Controller;
 
 class CategoriaController extends Controller 
 {
-    /**
-     * Listar todas las categorías.
-     */
     public function index(): JsonResponse 
     {
-        $categorias = Categoria::all();
+        $categorias = Categoria::with('subcategorias')->get();
         return response()->json($categorias);
     }
 
-    /**
-     * Crear una nueva categoría.
-     */
     public function store(Request $request): JsonResponse
     {
         try {
-            // 1. Validar (nombre obligatorio, máximo 50 caracteres y único)
             $request->validate([
                 'nombre' => 'required|string|max:50|unique:categorias,nombre',
+                'categoria_padre_id' => 'nullable|exists:categorias,id',
             ]);
 
-            // 2. Intentar guardar
             $categoria = Categoria::create($request->all());
 
-            // 3. Respuesta de éxito
             return response()->json([
                 'success' => true,
                 'message' => 'Categoría creada exitosamente.',
@@ -48,12 +39,9 @@ class CategoriaController extends Controller
         }
     }
 
-    /**
-     * Mostrar una categoría específica.
-     */
     public function show($id): JsonResponse
     {
-        $categoria = Categoria::find($id);
+        $categoria = Categoria::with('subcategorias', 'categoriaPadre')->find($id);
 
         if (!$categoria) {
             return response()->json(['message' => 'Categoría no encontrada'], 404);
@@ -62,9 +50,6 @@ class CategoriaController extends Controller
         return response()->json($categoria, 200);
     }
 
-    /**
-     * Actualizar una categoría existente.
-     */
     public function update(Request $request, $id): JsonResponse
     {
         try {
@@ -74,9 +59,9 @@ class CategoriaController extends Controller
                 return response()->json(['message' => 'Categoría no encontrada'], 404);
             }
 
-            // Validar: el nombre es único pero ignora el ID actual para permitir guardar sin cambios
             $request->validate([
-                'nombre' => 'required|string|max:50|unique:categorias,nombre,' . $id
+                'nombre' => 'required|string|max:50|unique:categorias,nombre,' . $id,
+                'categoria_padre_id' => 'nullable|exists:categorias,id',
             ]);
 
             $categoria->update($request->all());
@@ -96,9 +81,6 @@ class CategoriaController extends Controller
         }
     }
 
-    /**
-     * Eliminar una categoría.
-     */
     public function destroy($id): JsonResponse
     {
         try {
