@@ -34,7 +34,8 @@ class MetalurgicaSeeder extends Seeder
             'stock' => 40,
             'unidad_medida' => 'metro',
             'categoria_id' => $catPerfiles->id,
-            'marca_id' => $acindar->id
+            'marca_id' => $acindar->id,
+            'imagen_url' => 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=600'
         ]);
 
         Producto::create([
@@ -44,7 +45,8 @@ class MetalurgicaSeeder extends Seeder
             'stock' => 25,
             'unidad_medida' => 'metro',
             'categoria_id' => $catPerfiles->id,
-            'marca_id' => $acindar->id
+            'marca_id' => $acindar->id,
+            'imagen_url' => 'https://images.unsplash.com/photo-1535378917042-10a22c95931a?w=600'
         ]);
 
         // --- Categoría: Abrasivos y Corte (Venta por unidad) ---
@@ -55,7 +57,8 @@ class MetalurgicaSeeder extends Seeder
             'stock' => 150,
             'unidad_medida' => 'unidad',
             'categoria_id' => $catCorte->id,
-            'marca_id' => $sinpar->id
+            'marca_id' => $sinpar->id,
+            'imagen_url' => 'https://images.unsplash.com/photo-1504148455328-c376907d081c?w=600'
         ]);
 
         // --- Categoría: Soldadura ---
@@ -66,7 +69,8 @@ class MetalurgicaSeeder extends Seeder
             'stock' => 80,
             'unidad_medida' => 'kg',
             'categoria_id' => $catSoldadura->id,
-            'marca_id' => $conarco->id
+            'marca_id' => $conarco->id,
+            'imagen_url' => 'https://images.unsplash.com/photo-1560634951-92f13d3a229c?w=600'
         ]);
 
         // --- Categoría: Estructuras Terminadas (Lo tradicional del Ecommerce) ---
@@ -77,7 +81,8 @@ class MetalurgicaSeeder extends Seeder
             'stock' => 5,
             'unidad_medida' => 'unidad',
             'categoria_id' => $catEstructuras->id,
-            'marca_id' => $generico->id
+            'marca_id' => $generico->id,
+            'imagen_url' => 'https://images.unsplash.com/photo-1565428252355-3fdb3b3e3d8d?w=600'
         ]);
     }
 }
