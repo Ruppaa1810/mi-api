@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Producto;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Validation\ValidationException;
 
 class ProductoController extends Controller
 {
@@ -72,6 +73,11 @@ class ProductoController extends Controller
             ], 201);
 
         } catch (\Exception $e) {
+            // Si es un error de validación, lo dejamos pasar para que Laravel responda 422
+            if ($e instanceof ValidationException) {
+                throw $e;
+            }
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error al crear el producto.',
@@ -120,6 +126,11 @@ class ProductoController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
+            // Si es un error de validación, lo dejamos pasar para que Laravel responda 422
+            if ($e instanceof ValidationException) {
+                throw $e;
+            }
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error al actualizar el producto.',
@@ -145,6 +156,11 @@ class ProductoController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
+            // Si es un error de validación, lo dejamos pasar para que Laravel responda 422
+            if ($e instanceof ValidationException) {
+                throw $e;
+            }
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error al eliminar el producto.',
@@ -176,6 +192,11 @@ class ProductoController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
+            // Si es un error de validación, lo dejamos pasar para que Laravel responda 422
+            if ($e instanceof ValidationException) {
+                throw $e;
+            }
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error al actualizar los precios.',

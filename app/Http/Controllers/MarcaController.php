@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Marca;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Validation\ValidationException;
 
 class MarcaController extends Controller
 {
@@ -32,6 +33,11 @@ class MarcaController extends Controller
             ], 201);
 
         } catch (\Exception $e) {
+            // Si es un error de validación, lo dejamos pasar para que Laravel responda 422
+            if ($e instanceof ValidationException) {
+                throw $e;
+            }
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error al crear la marca.',
@@ -73,6 +79,11 @@ class MarcaController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
+            // Si es un error de validación, lo dejamos pasar para que Laravel responda 422
+            if ($e instanceof ValidationException) {
+                throw $e;
+            }
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error al actualizar.',
@@ -98,6 +109,11 @@ class MarcaController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
+            // Si es un error de validación, lo dejamos pasar para que Laravel responda 422
+            if ($e instanceof ValidationException) {
+                throw $e;
+            }
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error al eliminar la marca.',
