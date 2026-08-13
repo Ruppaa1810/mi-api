@@ -10,7 +10,9 @@ class MarcaController extends Controller
 {
     public function index(): JsonResponse
     {
-        $marcas = Marca::all();
+        // Traigo todas las marcas, junto con la cantidad de productos que tiene cada una
+        // (productos_count se usa en el panel admin para mostrar la columna "Productos")
+        $marcas = Marca::withCount('productos')->get();
         return response()->json($marcas);
     }
 
