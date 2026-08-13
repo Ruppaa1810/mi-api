@@ -10,7 +10,11 @@ class CategoriaController extends Controller
 {
     public function index(): JsonResponse 
     {
-        $categorias = Categoria::with('subcategorias')->get();
+        // Traigo las categorías con:
+        // - subcategorias: para mostrar cuántas hijas tiene cada categoría
+        // - categoriaPadre: para saber si es subcategoría y de quién
+        // - productos_count: cantidad de productos que tiene (la cuenta Eloquent)
+        $categorias = Categoria::with(['subcategorias', 'categoriaPadre'])->withCount('productos')->get();
         return response()->json($categorias);
     }
 
