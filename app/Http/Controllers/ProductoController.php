@@ -61,7 +61,7 @@ class ProductoController extends Controller
                 'stock'         => 'required|integer|min:0',
                 'categoria_id'  => 'required|exists:categorias,id',
                 'marca_id'      => 'required|exists:marcas,id', // Validación de la marca
-                'imagen_url'    => 'nullable|url|max:500'
+                'imagen_url'    => 'nullable|url|max:2000'
             ]);
 
             $producto = Producto::create($request->all());
@@ -114,7 +114,7 @@ class ProductoController extends Controller
                 'stock'         => 'required|integer',
                 'categoria_id'  => 'required|exists:categorias,id',
                 'marca_id'      => 'required|exists:marcas,id', // Validación de la marca
-                'imagen_url'    => 'nullable|url|max:500'
+                'imagen_url'    => 'nullable|url|max:2000'
             ]);
 
             $producto->update($request->all());
