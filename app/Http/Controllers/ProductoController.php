@@ -11,25 +11,20 @@ class ProductoController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        // Trae los productos con sus categorías y marcas de forma anidada
         $query = Producto::with(['categoria', 'marca']);
 
-        // Búsqueda por nombre
         if ($request->has('q') && $request->q !== '') {
             $query->where('nombre', 'like', '%' . $request->q . '%');
         }
 
-        // Filtro por categoría
         if ($request->has('categoria_id') && $request->categoria_id !== '') {
             $query->where('categoria_id', $request->categoria_id);
         }
 
-        // Filtro por marca
         if ($request->has('marca_id') && $request->marca_id !== '') {
             $query->where('marca_id', $request->marca_id);
         }
 
-        // Filtro por rango de precios
         if ($request->has('precio_min') && $request->precio_min !== '') {
             $query->where('precio', '>=', $request->precio_min);
         }
@@ -38,7 +33,6 @@ class ProductoController extends Controller
             $query->where('precio', '<=', $request->precio_max);
         }
 
-        // Ordenamiento por precio
         $orden = $request->get('orden');
         if ($orden === 'precio_asc') {
             $query->orderBy('precio', 'asc');
@@ -46,8 +40,7 @@ class ProductoController extends Controller
             $query->orderBy('precio', 'desc');
         }
 
-        $productos = $query->get();
-        return response()->json($productos, 200);
+        return response()->json($query->get(), 200);
     }
 
     public function store(Request $request): JsonResponse
@@ -60,8 +53,8 @@ class ProductoController extends Controller
                 'unidad_medida' => 'required|in:unidad,metro,kg,m2',
                 'stock'         => 'required|integer|min:0',
                 'categoria_id'  => 'required|exists:categorias,id',
-                'marca_id'      => 'required|exists:marcas,id', // Validación de la marca
-                'imagen_url'    => 'nullable|url|max:500'
+                'marca_id'      => 'required|exists:marcas,id',
+                'imagen_url'    => 'nullable|url|max:2000'
             ]);
 
             $producto = Producto::create($request->all());
@@ -73,11 +66,9 @@ class ProductoController extends Controller
             ], 201);
 
         } catch (\Exception $e) {
-            // Si es un error de validación, lo dejamos pasar para que Laravel responda 422
             if ($e instanceof ValidationException) {
                 throw $e;
             }
-
             return response()->json([
                 'success' => false,
                 'message' => 'Error al crear el producto.',
@@ -88,7 +79,6 @@ class ProductoController extends Controller
 
     public function show($id): JsonResponse
     {
-        // También incluimos la marca en la vista de un solo producto
         $producto = Producto::with(['categoria', 'marca'])->find($id);
 
         if (!$producto) {
@@ -113,8 +103,8 @@ class ProductoController extends Controller
                 'unidad_medida' => 'required|in:unidad,metro,kg,m2',
                 'stock'         => 'required|integer',
                 'categoria_id'  => 'required|exists:categorias,id',
-                'marca_id'      => 'required|exists:marcas,id', // Validación de la marca
-                'imagen_url'    => 'nullable|url|max:500'
+                'marca_id'      => 'required|exists:marcas,id',
+                'imagen_url'    => 'nullable|url|max:2000'
             ]);
 
             $producto->update($request->all());
@@ -126,11 +116,9 @@ class ProductoController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            // Si es un error de validación, lo dejamos pasar para que Laravel responda 422
             if ($e instanceof ValidationException) {
                 throw $e;
             }
-
             return response()->json([
                 'success' => false,
                 'message' => 'Error al actualizar el producto.',
@@ -156,11 +144,9 @@ class ProductoController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            // Si es un error de validación, lo dejamos pasar para que Laravel responda 422
             if ($e instanceof ValidationException) {
                 throw $e;
             }
-
             return response()->json([
                 'success' => false,
                 'message' => 'Error al eliminar el producto.',
@@ -192,11 +178,9 @@ class ProductoController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            // Si es un error de validación, lo dejamos pasar para que Laravel responda 422
             if ($e instanceof ValidationException) {
                 throw $e;
             }
-
             return response()->json([
                 'success' => false,
                 'message' => 'Error al actualizar los precios.',
