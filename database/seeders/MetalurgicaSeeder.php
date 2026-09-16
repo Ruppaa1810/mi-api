@@ -11,22 +11,17 @@ class MetalurgicaSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Cargar Marcas Reales del Rubro
-        $sinpar = Marca::create(['nombre' => 'Sinpar']); // Discos y corte
-        $acindar = Marca::create(['nombre' => 'Acindar']); // Hierros y perfiles
-        $conarco = Marca::create(['nombre' => 'Conarco']); // Electrodos y soldadura
-        $dowen = Marca::create(['nombre' => 'Dowen Pagio']); // Herramientas/Herrajes
+        $sinpar = Marca::create(['nombre' => 'Sinpar']);
+        $acindar = Marca::create(['nombre' => 'Acindar']);
+        $conarco = Marca::create(['nombre' => 'Conarco']);
+        $dowen = Marca::create(['nombre' => 'Dowen Pagio']);
         $generico = Marca::create(['nombre' => 'Genérico']);
 
-        // 2. Cargar Categorías
         $catPerfiles = Categoria::create(['nombre' => 'Perfiles y Hierros']);
         $catCorte = Categoria::create(['nombre' => 'Abrasivos y Corte']);
         $catSoldadura = Categoria::create(['nombre' => 'Soldadura e Insumos']);
         $catEstructuras = Categoria::create(['nombre' => 'Estructuras Estándar']);
 
-        // 3. Cargar Productos Reales
-        
-        // --- Categoría: Perfiles y Hierros (Venta por barra/metro) ---
         Producto::create([
             'nombre' => 'Hierro Angulo 1 x 1/8 (Barra 6m)',
             'descripcion' => 'Perfil de hierro ángulo laminado en caliente, ideal para herrería y estructuras.',
@@ -49,7 +44,6 @@ class MetalurgicaSeeder extends Seeder
             'imagen_url' => 'https://images.unsplash.com/photo-1535378917042-10a22c95931a?w=600'
         ]);
 
-        // --- Categoría: Abrasivos y Corte (Venta por unidad) ---
         Producto::create([
             'nombre' => 'Disco de Corte Flap 4.5 pulgadas',
             'descripcion' => 'Disco para amoladora angular, ideal para desbaste fino de soldaduras.',
@@ -61,7 +55,6 @@ class MetalurgicaSeeder extends Seeder
             'imagen_url' => 'https://images.unsplash.com/photo-1504148455328-c376907d081c?w=600'
         ]);
 
-        // --- Categoría: Soldadura ---
         Producto::create([
             'nombre' => 'Electrodos Punta Azul 6013 (Kilo)',
             'descripcion' => 'Electrodos para soldadura eléctrica de acero al carbono, arco suave.',
@@ -73,7 +66,6 @@ class MetalurgicaSeeder extends Seeder
             'imagen_url' => 'https://images.unsplash.com/photo-1560634951-92f13d3a229c?w=600'
         ]);
 
-        // --- Categoría: Estructuras Terminadas (Lo tradicional del Ecommerce) ---
         Producto::create([
             'nombre' => 'Canasto de Basura Estándar para Vereda',
             'descripcion' => 'Canasto reforzado con metal desplegado y base para cementar.',

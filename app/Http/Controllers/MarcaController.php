@@ -11,8 +11,6 @@ class MarcaController extends Controller
 {
     public function index(): JsonResponse
     {
-        // Traigo todas las marcas, junto con la cantidad de productos que tiene cada una
-        // (productos_count se usa en el panel admin para mostrar la columna "Productos")
         $marcas = Marca::withCount('productos')->get();
         return response()->json($marcas);
     }
@@ -33,11 +31,9 @@ class MarcaController extends Controller
             ], 201);
 
         } catch (\Exception $e) {
-            // Si es un error de validación, lo dejamos pasar para que Laravel responda 422
             if ($e instanceof ValidationException) {
                 throw $e;
             }
-
             return response()->json([
                 'success' => false,
                 'message' => 'Error al crear la marca.',
@@ -79,11 +75,9 @@ class MarcaController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            // Si es un error de validación, lo dejamos pasar para que Laravel responda 422
             if ($e instanceof ValidationException) {
                 throw $e;
             }
-
             return response()->json([
                 'success' => false,
                 'message' => 'Error al actualizar.',
@@ -109,11 +103,9 @@ class MarcaController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            // Si es un error de validación, lo dejamos pasar para que Laravel responda 422
             if ($e instanceof ValidationException) {
                 throw $e;
             }
-
             return response()->json([
                 'success' => false,
                 'message' => 'Error al eliminar la marca.',

@@ -7,14 +7,10 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
 
-class CategoriaController extends Controller 
+class CategoriaController extends Controller
 {
-    public function index(): JsonResponse 
+    public function index(): JsonResponse
     {
-        // Traigo las categorías con:
-        // - subcategorias: para mostrar cuántas hijas tiene cada categoría
-        // - categoriaPadre: para saber si es subcategoría y de quién
-        // - productos_count: cantidad de productos que tiene (la cuenta Eloquent)
         $categorias = Categoria::with(['subcategorias', 'categoriaPadre'])->withCount('productos')->get();
         return response()->json($categorias);
     }
@@ -36,11 +32,9 @@ class CategoriaController extends Controller
             ], 201);
 
         } catch (\Exception $e) {
-            // Si es un error de validación, lo dejamos pasar para que Laravel responda 422
             if ($e instanceof ValidationException) {
                 throw $e;
             }
-
             return response()->json([
                 'success' => false,
                 'message' => 'Error al crear la categoría.',
@@ -83,11 +77,9 @@ class CategoriaController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            // Si es un error de validación, lo dejamos pasar para que Laravel responda 422
             if ($e instanceof ValidationException) {
                 throw $e;
             }
-
             return response()->json([
                 'success' => false,
                 'message' => 'Error al actualizar.',
@@ -113,11 +105,9 @@ class CategoriaController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            // Si es un error de validación, lo dejamos pasar para que Laravel responda 422
             if ($e instanceof ValidationException) {
                 throw $e;
             }
-
             return response()->json([
                 'success' => false,
                 'message' => 'Error al eliminar la categoría.',
