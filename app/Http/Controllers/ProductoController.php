@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Categoria;
 use App\Models\Producto;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -18,7 +19,10 @@ class ProductoController extends Controller
         }
 
         if ($request->has('categoria_id') && $request->categoria_id !== '') {
-            $query->where('categoria_id', $request->categoria_id);
+            $ids = Categoria::where('categoria_padre_id', $request->categoria_id)
+                ->pluck('id')
+                ->push((int) $request->categoria_id);
+            $query->whereIn('categoria_id', $ids);
         }
 
         if ($request->has('marca_id') && $request->marca_id !== '') {
