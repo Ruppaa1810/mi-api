@@ -12,4 +12,5 @@ fi
 
 php artisan config:cache
 php artisan route:cache
+export PHP_CLI_SERVER_WORKERS=${PHP_CLI_SERVER_WORKERS:-4}
 exec php artisan serve --host=0.0.0.0 --port=${PORT:-10000}
