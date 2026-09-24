@@ -8,6 +8,11 @@ class Producto extends Model
 {
     protected $fillable = ['nombre', 'descripcion', 'precio', 'stock', 'categoria_id', 'marca_id', 'unidad_medida', 'imagen_url'];
 
+    protected $casts = [
+        'precio' => 'float',
+        'stock' => 'integer',
+    ];
+
     public function categoria()
     {
         return $this->belongsTo(Categoria::class);
