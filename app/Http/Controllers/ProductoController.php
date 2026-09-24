@@ -15,7 +15,7 @@ class ProductoController extends Controller
         $query = Producto::with(['categoria', 'marca']);
 
         if ($request->has('q') && $request->q !== '') {
-            $query->where('nombre', 'like', '%' . $request->q . '%');
+            $query->whereRaw('LOWER(nombre) LIKE ?', ['%' . mb_strtolower($request->q) . '%']);
         }
 
         if ($request->has('categoria_id') && $request->categoria_id !== '') {
