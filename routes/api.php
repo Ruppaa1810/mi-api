@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoriaController;
+use App\Http\Controllers\ImagenController;
 use App\Http\Controllers\MarcaController;
 use App\Http\Controllers\ProductoController;
 use Illuminate\Support\Facades\Route;
@@ -15,12 +16,14 @@ Route::get('marcas', [MarcaController::class, 'index']);
 Route::get('marcas/{id}', [MarcaController::class, 'show']);
 Route::get('productos', [ProductoController::class, 'index']);
 Route::get('productos/{id}', [ProductoController::class, 'show']);
+Route::get('imagenes/{id}', [ImagenController::class, 'show']);
 
 Route::middleware('auth:sanctum', 'admin')->prefix('admin')->group(function () {
     Route::apiResource('categorias', CategoriaController::class)->except(['index', 'show']);
     Route::apiResource('marcas', MarcaController::class)->except(['index', 'show']);
     Route::apiResource('productos', ProductoController::class)->except(['index', 'show']);
     Route::post('productos/actualizar-precios', [ProductoController::class, 'actualizarPreciosMasivo']);
+    Route::post('imagenes', [ImagenController::class, 'store']);
 });
 
 Route::middleware('auth:sanctum')->group(function () {
