@@ -10,21 +10,28 @@ use Illuminate\Support\Facades\Route;
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
 
-Route::get('categorias', [CategoriaController::class, 'index']);
-Route::get('categorias/{id}', [CategoriaController::class, 'show']);
-Route::get('marcas', [MarcaController::class, 'index']);
-Route::get('marcas/{id}', [MarcaController::class, 'show']);
-Route::get('productos', [ProductoController::class, 'index']);
-Route::get('productos/{id}', [ProductoController::class, 'show']);
-Route::get('imagenes/{id}', [ImagenController::class, 'show']);
+// Por ahora sin login, como en clase. Se protege cuando veamos Sanctum.
+Route::get('/categorias', [CategoriaController::class, 'index']);
+Route::get('/categorias/{id}', [CategoriaController::class, 'show']);
+Route::post('/categorias', [CategoriaController::class, 'store']);
+Route::put('/categorias/{id}', [CategoriaController::class, 'update']);
+Route::delete('/categorias/{id}', [CategoriaController::class, 'destroy']);
 
-Route::middleware('auth:sanctum', 'admin')->prefix('admin')->group(function () {
-    Route::apiResource('categorias', CategoriaController::class)->except(['index', 'show']);
-    Route::apiResource('marcas', MarcaController::class)->except(['index', 'show']);
-    Route::apiResource('productos', ProductoController::class)->except(['index', 'show']);
-    Route::post('productos/actualizar-precios', [ProductoController::class, 'actualizarPreciosMasivo']);
-    Route::post('imagenes', [ImagenController::class, 'store']);
-});
+Route::get('/marcas', [MarcaController::class, 'index']);
+Route::get('/marcas/{id}', [MarcaController::class, 'show']);
+Route::post('/marcas', [MarcaController::class, 'store']);
+Route::put('/marcas/{id}', [MarcaController::class, 'update']);
+Route::delete('/marcas/{id}', [MarcaController::class, 'destroy']);
+
+Route::get('/productos', [ProductoController::class, 'index']);
+Route::get('/productos/{id}', [ProductoController::class, 'show']);
+Route::post('/productos', [ProductoController::class, 'store']);
+Route::put('/productos/{id}', [ProductoController::class, 'update']);
+Route::delete('/productos/{id}', [ProductoController::class, 'destroy']);
+Route::post('/productos/actualizar-precios', [ProductoController::class, 'actualizarPreciosMasivo']);
+
+Route::get('/imagenes/{id}', [ImagenController::class, 'show']);
+Route::post('/imagenes', [ImagenController::class, 'store']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
