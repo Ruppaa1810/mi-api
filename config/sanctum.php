@@ -12,7 +12,8 @@ return [
 
     'guard' => ['web'],
 
-    'expiration' => null,
+    // El token vence a los 60 minutos (Clase 5: tokens de vida corta)
+    'expiration' => 60,
 
     'token_prefix' => env('SANCTUM_TOKEN_PREFIX', ''),
 

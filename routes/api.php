@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Route;
 
 // --- Rutas Públicas ---
 Route::post('register', [AuthController::class, 'register']);
-Route::post('login', [AuthController::class, 'login']);
+// Máximo 5 intentos de login por minuto (Clase 5: limitar intentos)
+Route::post('login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 
 Route::get('/categorias', [CategoriaController::class, 'index']);
 Route::get('/categorias/{id}', [CategoriaController::class, 'show']);
