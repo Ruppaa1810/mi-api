@@ -7,7 +7,7 @@ fi
 php artisan migrate --force
 
 if [ -n "$ADMIN_PASSWORD" ]; then
-  php artisan db:seed --class=AdminSeeder --force
+  php artisan db:seed --class=RoleSeeder --force
 fi
 
 php artisan config:cache
