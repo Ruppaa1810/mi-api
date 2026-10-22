@@ -3,104 +3,80 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    public function register(Request $request): JsonResponse
+    // Registro: Asigna rol 'Cliente' por defecto
+    public function register(Request $request)
     {
         try {
             $request->validate([
-                'name'     => 'required|string|max:255',
-                'email'    => 'required|email|unique:users,email',
-                'password' => 'required|string|min:6|confirmed',
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users,email',
+                'password' => 'required|string|min:8',
             ]);
-
-            $usuario = User::create([
-                'name'     => $request->name,
-                'email'    => $request->email,
-                'password' => $request->password,
-                'role'     => 'usuario',
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
             ]);
-
-            $token = $usuario->createToken('auth-token')->plainTextToken;
-
+            // Asignar rol Cliente por defecto
+            $user->assignRole('Cliente');
+            $token = $user->createToken('auth_token')->plainTextToken;
             return response()->json([
-                'success' => true,
-                'message' => 'Registro exitoso.',
-                'data'    => [
-                    'usuario' => $usuario,
-                    'token'   => $token,
-                ],
+                'message' => 'Usuario registrado exitosamente',
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+                'user' => $user
             ], 201);
-
         } catch (ValidationException $e) {
-            throw $e;
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al registrar el usuario.',
-                'error'   => $e->getMessage(),
-            ], 500);
+            return response()->json($e->errors(), 400);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
-    public function login(Request $request): JsonResponse
+    public function login(Request $request)
     {
-        try {
-            $request->validate([
-                'email'    => 'required|email',
-                'password' => 'required|string',
-            ]);
-
-            $usuario = User::where('email', $request->email)->first();
-
-            if (!$usuario || !Hash::check($request->password, $usuario->password)) {
-                throw ValidationException::withMessages([
-                    'email' => ['Las credenciales son incorrectas.'],
-                ]);
-            }
-
-            $token = $usuario->createToken('auth-token')->plainTextToken;
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Inicio de sesión exitoso.',
-                'data'    => [
-                    'usuario' => $usuario,
-                    'token'   => $token,
-                ],
-            ]);
-
-        } catch (ValidationException $e) {
-            throw $e;
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al iniciar sesión.',
-                'error'   => $e->getMessage(),
-            ], 500);
+        $request->validate([
+            'email' => 'required|string|email',
+            'password' => 'required|string',
+        ]);
+        $user = User::where('email', $request->email)->first();
+        if (! $user || ! Hash::check($request->password, $user->password)) {
+            return response()->json(
+                ['message' => 'Las credenciales proporcionadas son incorrectas.'],
+                401
+            );
         }
+        // Borrar tokens anteriores (para sesión única)
+        $user->tokens()->delete();
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        // Solo los nombres de los roles
+        $roleNames = $user->roles->pluck('name');
+
+        return response()->json([
+            'message' => 'Bienvenido ' . $user->name,
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email
+            ],
+            'role' => $roleNames[0] ?? null, // null si es un usuario viejo que no tiene rol
+        ]);
     }
 
-    public function logout(Request $request): JsonResponse
+    // Cerrar sesión del usuario autenticado (borra el token actual)
+    public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Sesión cerrada.',
-        ]);
-    }
-
-    public function me(Request $request): JsonResponse
-    {
-        return response()->json([
-            'success' => true,
-            'data'    => $request->user(),
-        ]);
+        return response()->json(['message' => 'Sesión cerrada correctamente']);
     }
 }

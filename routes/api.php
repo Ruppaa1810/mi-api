@@ -5,6 +5,7 @@ use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\ImagenController;
 use App\Http\Controllers\MarcaController;
 use App\Http\Controllers\ProductoController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::post('register', [AuthController::class, 'register']);
@@ -35,5 +36,7 @@ Route::post('/imagenes', [ImagenController::class, 'store']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
-    Route::get('user', [AuthController::class, 'me']);
+    Route::get('user', function (Request $request) {
+        return $request->user();
+    });
 });
