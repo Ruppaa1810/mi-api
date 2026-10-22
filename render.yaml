@@ -14,7 +14,7 @@ services:
       - key: DB_URL
         sync: false
       - key: CACHE_STORE
-        value: array
+        value: file
       - key: SESSION_DRIVER
         value: array
       - key: QUEUE_CONNECTION
