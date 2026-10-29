@@ -14,8 +14,18 @@ class ProductoController extends Controller
     {
         $query = Producto::with(['categoria', 'marca']);
 
+        // Busca la palabra en el nombre o en la descripción (Notion)
         if ($request->has('q') && $request->q !== '') {
-            $query->whereRaw('LOWER(nombre) LIKE ?', ['%' . mb_strtolower($request->q) . '%']);
+            $busqueda = '%' . mb_strtolower($request->q) . '%';
+            $query->where(function ($q) use ($busqueda) {
+                $q->whereRaw('LOWER(nombre) LIKE ?', [$busqueda])
+                  ->orWhereRaw('LOWER(descripcion) LIKE ?', [$busqueda]);
+            });
+        }
+
+        // La tienda solo muestra los productos activos y con stock (Notion)
+        if ($request->boolean('solo_disponibles')) {
+            $query->where('estado', 'Activo')->where('stock', '>', 0);
         }
 
         if ($request->has('categoria_id') && $request->categoria_id !== '') {
@@ -56,6 +66,7 @@ class ProductoController extends Controller
                 'precio'        => 'required|numeric|min:0',
                 'unidad_medida' => 'required|in:unidad,metro,kg,m2',
                 'stock'         => 'required|integer|min:0',
+                'estado'        => 'required|in:Activo,Inactivo', // Validación ENUM
                 'categoria_id'  => 'required|exists:categorias,id',
                 'marca_id'      => 'required|exists:marcas,id',
                 'imagen_url'    => 'nullable|url|max:2000'
@@ -106,6 +117,7 @@ class ProductoController extends Controller
                 'precio'        => 'required|numeric',
                 'unidad_medida' => 'required|in:unidad,metro,kg,m2',
                 'stock'         => 'required|integer',
+                'estado'        => 'required|in:Activo,Inactivo', // Validación ENUM
                 'categoria_id'  => 'required|exists:categorias,id',
                 'marca_id'      => 'required|exists:marcas,id',
                 'imagen_url'    => 'nullable|url|max:2000'
