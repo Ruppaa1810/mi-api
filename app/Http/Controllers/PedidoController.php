@@ -104,6 +104,93 @@ class PedidoController extends Controller
         }
     }
 
+    // Todos los pedidos para el administrador: CU-PP-A-001
+    public function index(Request $request): JsonResponse
+    {
+        $query = Pedido::with(['user', 'detalles.producto']);
+
+        // Filtro por estado (ej: solo Pendientes)
+        if ($request->has('estado') && $request->estado !== '') {
+            $query->where('estado', $request->estado);
+        }
+
+        // Búsqueda por número de pedido, o por nombre o email del cliente
+        if ($request->has('q') && $request->q !== '') {
+            if (is_numeric($request->q)) {
+                $query->where('id', $request->q);
+            } else {
+                $busqueda = '%' . mb_strtolower($request->q) . '%';
+                $query->whereHas('user', function ($q) use ($busqueda) {
+                    $q->whereRaw('LOWER(name) LIKE ?', [$busqueda])
+                      ->orWhereRaw('LOWER(email) LIKE ?', [$busqueda]);
+                });
+            }
+        }
+
+        return response()->json($query->latest()->get(), 200);
+    }
+
+    // Cambiar el estado de un pedido: CU-PP-A-002
+    public function actualizarEstado(Request $request, $id): JsonResponse
+    {
+        try {
+            $request->validate([
+                'estado'           => 'required|in:Pendiente,Procesando,Enviado,Entregado,Cancelado',
+                'reintegrar_stock' => 'nullable|boolean',
+            ]);
+
+            $pedido = Pedido::with('detalles')->find($id);
+
+            if (!$pedido) {
+                return response()->json(['message' => 'Pedido no encontrado'], 404);
+            }
+
+            // Un pedido Entregado o Cancelado ya terminó: no se puede cambiar
+            if (in_array($pedido->estado, ['Entregado', 'Cancelado'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "El pedido ya está {$pedido->estado} y no se puede cambiar."
+                ], 422);
+            }
+
+            // El pedido solo avanza: Pendiente → Procesando → Enviado → Entregado (o se cancela)
+            $orden = ['Pendiente' => 0, 'Procesando' => 1, 'Enviado' => 2, 'Entregado' => 3];
+            if ($request->estado !== 'Cancelado' && $orden[$request->estado] <= $orden[$pedido->estado]) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "No se puede pasar de {$pedido->estado} a {$request->estado}."
+                ], 422);
+            }
+
+            DB::transaction(function () use ($request, $pedido) {
+                // Si se cancela y el admin lo pide, se devuelve el stock de cada producto
+                if ($request->estado === 'Cancelado' && $request->boolean('reintegrar_stock')) {
+                    foreach ($pedido->detalles as $detalle) {
+                        Producto::where('id', $detalle->producto_id)->increment('stock', $detalle->cantidad);
+                    }
+                }
+
+                $pedido->update(['estado' => $request->estado]);
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Estado del pedido actualizado.',
+                'data'    => $pedido
+            ], 200);
+
+        } catch (\Exception $e) {
+            if ($e instanceof ValidationException) {
+                throw $e;
+            }
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al actualizar el estado del pedido.',
+                'error'   => $e->getMessage()
+            ], 500);
+        }
+    }
+
     // Historial del cliente logueado: CU-PP-C-002
     public function misPedidos(Request $request): JsonResponse
     {

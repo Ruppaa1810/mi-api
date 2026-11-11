@@ -55,5 +55,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/productos/actualizar-precios', [ProductoController::class, 'actualizarPreciosMasivo']);
 
         Route::post('/imagenes', [ImagenController::class, 'store']);
+
+        Route::get('/pedidos', [PedidoController::class, 'index']);
+        Route::put('/pedidos/{id}/estado', [PedidoController::class, 'actualizarEstado']);
     });
 });
