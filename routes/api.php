@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\ImagenController;
 use App\Http\Controllers\MarcaController;
+use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\ProductoController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -32,6 +33,12 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::post('logout', [AuthController::class, 'logout']);
+
+    // Comprar y ver mis compras: cualquier usuario logueado
+    Route::middleware('role:Cliente|Administrador')->group(function () {
+        Route::post('/pedidos', [PedidoController::class, 'store']);
+        Route::get('/mis-pedidos', [PedidoController::class, 'misPedidos']);
+    });
 
     Route::middleware('role:Administrador')->group(function () {
         Route::post('/categorias', [CategoriaController::class, 'store']);
